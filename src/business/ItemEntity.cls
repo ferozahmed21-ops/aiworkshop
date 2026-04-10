@@ -56,6 +56,11 @@ CLASS business.ItemEntity INHERITS BusinessEntity USE-WIDGET-POOL:
         lFound = CAN-FIND(FIRST ttItem).
 
         RETURN lFound.
+
+        CATCH e AS Progress.Lang.Error:
+            LOG-MANAGER:WRITE-MESSAGE("GetItemByNumber error: " + e:GetMessage(1), "ERROR").
+            RETURN FALSE.
+        END CATCH.
     END METHOD.
 
     /*------------------------------------------------------------------------------
@@ -65,6 +70,11 @@ CLASS business.ItemEntity INHERITS BusinessEntity USE-WIDGET-POOL:
     METHOD PUBLIC VOID UpdateItem(INPUT-OUTPUT DATASET dsItem):
         /* Update data in database */
         THIS-OBJECT:UpdateData(DATASET dsItem BY-REFERENCE).
+
+        CATCH e AS Progress.Lang.Error:
+            LOG-MANAGER:WRITE-MESSAGE("UpdateItem error: " + e:GetMessage(1), "ERROR").
+            UNDO, THROW e.
+        END CATCH.
     END METHOD.
 
     /*------------------------------------------------------------------------------
@@ -95,6 +105,12 @@ CLASS business.ItemEntity INHERITS BusinessEntity USE-WIDGET-POOL:
         END.
 
         RETURN isValid.
+
+        CATCH e AS Progress.Lang.Error:
+            LOG-MANAGER:WRITE-MESSAGE("ValidateItem error: " + e:GetMessage(1), "ERROR").
+            errorMessage = "Unexpected validation error: " + e:GetMessage(1).
+            RETURN FALSE.
+        END CATCH.
     END METHOD.
 
 END CLASS.
